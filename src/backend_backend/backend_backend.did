@@ -1,3 +1,7 @@
+type Result = variant { Ok; Err : text };
 service : {
-    "greet": (text) -> (text) query;
+  get_data : () -> (text) query;
+  get_registered_principals : () -> (vec text) query;
+  register_principal : (text) -> (Result);
+  sync_updates : (text, text) -> (Result);
 }
