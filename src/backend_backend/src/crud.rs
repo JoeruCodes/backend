@@ -1,4 +1,3 @@
-use candid::Principal;
 use ic_cdk_macros::{query, update};
 use crate::{UserData, CANISTER_DATA};
 
@@ -18,25 +17,21 @@ fn sync_updates(wallet_address: String, data: String) -> Result<(), String> {
 }
 
 #[update]
-fn register_principal(wallet_address: String) -> Result<(), String> {
+fn register_principal(data: UserData) -> Result<(), String> {
     // Access the CANISTER_DATA using thread-local storage or appropriate concurrency control
     CANISTER_DATA.with(|cans_data| {
         // Borrow the mutable map safely
         let mut map = cans_data.borrow_mut();
-
+        let principal = data.profile.user_id.to_text();
         // Check if the wallet_address is already registered
-        if map.contains_key(&wallet_address) {
+        if map.contains_key(&principal) {
             Ok(())
         } else {
             // Wallet address is not registered; proceed to register
-            let user_data = UserData {
-                wallet_address: wallet_address.clone(),
-                // Initialize other fields with default values
-                ..Default::default()
-            };
+            let user_data = data;
 
             // Insert the new UserData into the map
-            map.insert(wallet_address.clone(), user_data);
+            map.insert(principal, user_data);
 
 
             Ok(())

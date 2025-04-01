@@ -26,62 +26,81 @@ thread_local! {
 }
 
 // Define the UserData struct with necessary fields
-#[derive(Deserialize, CandidType, Clone, Debug, Serialize)]
-struct UserData {
-    #[serde(default)]
-    name: Option<String>,
-    wallet_address: String,
-    clicks: usize,
-    #[serde(default)]
+#[derive(Deserialize, Clone, Debug, Serialize, CandidType)]
+struct UserProfile {
+    user_id: Principal,
     email: Option<String>,
-    #[serde(default)]
-    twitter: Option<String>,
-    #[serde(default)]
-    instagram: Option<String>,
-    exp: usize,
-    rating: usize,
-    streak_count: usize,
-    last_login: usize,
-    #[serde(default)]
-    aliens: Vec<usize>,
-    #[serde(default)]
-    power_ups: Vec<PowerUpKind>,
-    #[serde(default)]
+    pfp: Option<String>,
+    last_login: u64,
+}
+
+#[derive(Deserialize, Clone, Debug, Serialize, CandidType)]
+struct GameState {
+    active_aliens: [usize; 16],
+    inventory_aliens: Vec<usize>,
+    power_ups: [Option<PowerUpKind>; 3],
+    king_lvl: usize,
+    total_merged_aliens: usize,
+}
+
+#[derive(Deserialize, Clone, Debug, Serialize, CandidType)]
+struct Progress {
+    iq: usize,
+    social_score: usize,
+    product: usize,
+    all_task_done: bool,
+    akai_balance: usize,
+    total_task_completed: usize,
+    streak: usize,
     badges: Vec<BadgesKind>,
 }
 
-impl Default for UserData {
-    fn default() -> Self {
-        Self {
-            name: None,
-            wallet_address: String::new(),
-            clicks: 0,
-            email: None,
-            twitter: None,
-            instagram: None,
-            exp: 0,
-            rating: 0,
-            streak_count: 0,
-            last_login: 0,
-            aliens: vec![],
-            power_ups: vec![],
-            badges: vec![],
-        }
-    }
+#[derive(Deserialize, Clone, Debug, Serialize, CandidType)]
+struct SocialData {
+    players_referred: usize,
+    referal_code: String,
+}
+
+#[derive(Deserialize, Clone, Debug, Serialize, CandidType)]
+struct UserData {
+    profile: UserProfile,
+    game_state: GameState,
+    progress: Progress,
+    social: SocialData,
+    league: LeagueType,
 }
 
 // Define enums for PowerUpKind and BadgesKind
-#[derive(Clone, Debug, Deserialize, CandidType, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Copy, CandidType)]
 enum PowerUpKind {
-    Spawner,
-    ClickMultiplier,
-    AutoFiller,
-    AlienMultiplier,
+    RowPowerUp,
+    ColumnPowerUp,
+    NearestSquarePowerUp,
 }
 
-#[derive(Clone, Debug, Deserialize, CandidType, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, CandidType)]
 enum BadgesKind {
-    LoginStreak { lvl: usize },
+    TenTaskBadge,
+    TwentyTaskBadge,
+    ThirtyTaskBadge,
+}
+
+#[derive(Deserialize, Clone, Debug, Serialize, PartialEq, CandidType)]
+enum LeagueType {
+    Bronze,
+    Silver,
+    Gold,
+    Platinum,
+    Diamond,
+    Master,
+    GrandMaster,
+    Challenger,
+}
+
+#[derive(Deserialize, Clone, Debug, Serialize, CandidType)]
+struct LeaderboardData {
+    league: usize,
+    global: usize,
 }
 
 // Implement the Storable trait for UserData
